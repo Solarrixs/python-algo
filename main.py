@@ -1,15 +1,40 @@
 import robin_stocks.robinhood as r
-import pandas as pd
-import positions as pos
+import logic as rlogic
 import pyotp
+import time
+import sys
+import threading
+import gui
+import os
+from dotenv import load_dotenv
 
-# Login Functions
-totp = pyotp.TOTP("ZZTFXAFBRVUQID4T").now()
-login = r.login("ma.xxy11@protonmail.com","K@UE*wU#wKaUp8@$cxwhehn!ujWx4^i@CV5D2", mfa_code=totp)
+def login():
+    load_dotenv()
+    r.login(
+        os.environ.get("USERNAME"),
+        os.environ.get("PASSWORD"),
+        mfa_code=pyotp.TOTP(os.environ.get("TOTP")).now()
+    )
 
-# Functions
-portfolio = pos.calculate_portfolio_returns()
-print(portfolio)
+def check_price_change_loop():
+    while True:
+        wait_seconds = rlogic.wait_until_market_open()
+        if wait_seconds == 0:
+            rlogic.check_price_change()
+            time.sleep(60)
+        else:
+            time.sleep(wait_seconds)
+        
+def run():
+    login()
+    app = gui.QApplication(sys.argv)
+    ex = gui.StockApp()
 
-total_return_sum = pos.total_return(portfolio)
-print("Sum of Total Return:", total_return_sum)
+    # Start the price check loop in a separate thread
+    threading.Thread(target=check_price_change_loop, daemon=True).start()
+
+    ex.show()
+    sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    run()

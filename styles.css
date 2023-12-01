@@ -1,0 +1,71 @@
+/* Global Dark Mode */
+QMainWindow {
+    background-color: #0d0d0d;
+}
+
+QLabel, QPushButton, QTextEdit {
+    color: white;
+}
+
+/* Button CSS */
+QPushButton#updateButton {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 5%;
+}
+
+QPushButton#updateButton:hover {
+    background-color: #2980b9;
+}
+
+QPushButton#quitButton {
+    background-color: #FF5733;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 5%;
+}
+
+QPushButton#quitButton:hover {
+    background-color: #D9534F;
+}
+
+QPushButton#buyButton {
+    background-color: #5CB85C;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 5%;
+}
+
+QPushButton#buyButton:hover {
+    background-color: #449D44;
+}
+
+/* QTableWidget appearance */
+#tableWidget {
+    background-color: #1a1a1a;
+}
+
+QTableWidget {
+    font-family: Arial;
+    font-size: 12pt;
+    color: #fff;
+}
+
+QHeaderView::section {
+    background-color: #313131;
+    color: #fff;
+}
+
+QTableWidget::item {
+    border-bottom: 1px solid #555555;
+    border-right: 1px solid #555555;
+}
+
+QTableWidget::item:selected {
+    background-color: #2876aa;
+    color: #fff;
+}
