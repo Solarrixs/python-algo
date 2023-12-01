@@ -9,12 +9,17 @@ import os
 from dotenv import load_dotenv
 
 def login():
-    load_dotenv()
-    r.login(
-        os.environ.get("USERNAME"),
-        os.environ.get("PASSWORD"),
-        mfa_code=pyotp.TOTP(os.environ.get("TOTP")).now()
-    )
+    dotenv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    load_dotenv(dotenv_path)
+    username = os.environ.get("USERNAME")
+    password = os.environ.get("PASSWORD")
+    totp_key = os.environ.get("TOTP")
+    
+    if not all([username, totp_key, password]):
+        raise ValueError("One or more required environment variables are not set")
+
+    code = pyotp.TOTP(totp_key).now()
+    r.login(username, password, mfa_code=code)
 
 def check_price_change_loop():
     while True:

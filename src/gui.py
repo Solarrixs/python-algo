@@ -9,7 +9,7 @@ class StockApp(QMainWindow):
         self.initUI()
         self.start_auto_update()
         self.update_portfolio()
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
 
     def initUI(self):
         self.setWindowTitle("Robinhood Stock Portfolio App")
@@ -19,7 +19,7 @@ class StockApp(QMainWindow):
         self.tableWidget = QTableWidget(self)
         self.tableWidget.setGeometry(50, 100, 900, 400)
         self.tableWidget.setObjectName("tableWidget")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
 
         # Sum of Total Return Label
         self.label_total_return = QLabel("Sum of Total Return: $0.00", self)
@@ -29,49 +29,49 @@ class StockApp(QMainWindow):
         # Buy Button
         self.btn_buy = QPushButton("Buy", self)
         self.btn_buy.setObjectName("buyButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_buy.move(50, 50)
         
         # Limit Buy Button
         self.btn_limit_buy = QPushButton("Limit Buy", self)
         self.btn_limit_buy.setObjectName("buyButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_limit_buy.move(160, 50)
         
         # Sell All Button
         self.btn_sell = QPushButton("Sell", self)
         self.btn_sell.setObjectName("quitButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_sell.move(270, 50)
         
         # Sell All Button
         self.btn_sell = QPushButton("Sell All", self)
         self.btn_sell.setObjectName("quitButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_sell.move(380, 50)
 
         # Stop Loss Button
         self.btn_stop_loss = QPushButton("Stop Loss", self)
         self.btn_stop_loss.setObjectName("quitButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_stop_loss.move(490, 50)
         
         # Trailing Stop Loss Button
         self.btn_trailing_stop_loss = QPushButton("TRL", self)
         self.btn_trailing_stop_loss.setObjectName("quitButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_trailing_stop_loss.move(600, 50)
         
         # Quit button
         self.btn_algo = QPushButton("Algo Trade", self)
         self.btn_algo.setObjectName("updateButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_algo.move(850, 50)
         
         # Update Button
         self.btn_update = QPushButton("Update", self)
         self.btn_update.setObjectName("buyButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         self.btn_update.clicked.connect(self.update_portfolio)
         self.btn_update.move(740, 510)
         self.btn_update.resize(100, 30)
@@ -79,7 +79,7 @@ class StockApp(QMainWindow):
         # Quit button
         quit_button = QPushButton("Quit", self)
         quit_button.setObjectName("quitButton")
-        self.load_stylesheet("styles.css")
+        self.load_stylesheet("resources/styles.css")
         quit_button.clicked.connect(self.close)
         quit_button.move(850, 510)
         quit_button.resize(100, 30)
