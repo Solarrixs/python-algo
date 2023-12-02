@@ -1,6 +1,6 @@
 import sys
 import webbrowser
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QHeaderView, QHBoxLayout, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QHeaderView, QHBoxLayout, QVBoxLayout, QWidget, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt, QTimer, QFile, QThread, pyqtSignal
 import portfoliologic as pl
 import operationlogic as ol
@@ -36,25 +36,19 @@ class StockApp(QMainWindow):
         # Header Buttons
         hboxHeader = QHBoxLayout()
         
-        self.btn_buy = self.createButton("Risk-Set Buy", "buyButton", ol.on_buy)
+        self.btn_buy = self.createButton("Buy", "buyButton", ol.on_buy)
+        self.btn_buy.setFixedWidth(100)
         hboxHeader.addWidget(self.btn_buy)
 
-        self.btn_limit_buy = self.createButton("Limit Buy", "buyButton", ol.on_limit_buy)
-        hboxHeader.addWidget(self.btn_limit_buy)
-
         self.btn_sell = self.createButton("Sell", "quitButton", ol.on_sell)
+        self.btn_sell.setFixedWidth(100)
         hboxHeader.addWidget(self.btn_sell)
-
-        self.btn_sell_all = self.createButton("Sell All", "quitButton", ol.on_sell_all)
-        hboxHeader.addWidget(self.btn_sell_all)
-
-        self.btn_stop_loss = self.createButton("Stop Loss", "quitButton", ol.on_stop_loss)
-        hboxHeader.addWidget(self.btn_stop_loss)
-
-        self.btn_trailing_stop_loss = self.createButton("TSL", "quitButton", ol.on_trailing_stop_loss)
-        hboxHeader.addWidget(self.btn_trailing_stop_loss)
+        
+        spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        hboxHeader.addSpacerItem(spacer)
 
         self.btn_algo = self.createButton("Algo Trade", "updateButton", al.on_algo_trade)
+        self.btn_algo.setFixedWidth(100)
         hboxHeader.addWidget(self.btn_algo)
         
         # Footer Buttons and Label
