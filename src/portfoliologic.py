@@ -1,8 +1,9 @@
 import robin_stocks.robinhood as r
 import pandas as pd
-import logic as rlogic
 import os
-import datetime
+import datetime, time
+import pyotp
+from dotenv import load_dotenv
 
 def calculate_portfolio_returns():
     # All tickers in portfolio
@@ -21,44 +22,30 @@ def calculate_portfolio_returns():
             open_prices.append(None)
 
     # Get latest price of all tickers
-    ticker_latest_price = r.get_latest_price(ticker_list)
-    latest_price_dict = {ticker: price for ticker, price in zip(ticker_list, ticker_latest_price)}
+    latest_prices = r.get_latest_price(ticker_list)
+
+    # Creating DataFrame for ticker, open prices and latest prices
+    prices_df = pd.DataFrame({'Ticker': ticker_list, 'Open Price': open_prices, 'Latest Price': latest_prices})
+    prices_df.set_index('Ticker', inplace=True)
+    prices_df = prices_df.apply(pd.to_numeric)
 
     # Get data on current open positions
-    open_stock_position_info = r.get_open_stock_positions()
-    combined_positions = [{'Buy-In Price': position['average_buy_price'], 'Shares': position['quantity']}
-                          for position in open_stock_position_info
-                          if 'average_buy_price' in position and 'quantity' in position]
+    holdings = r.build_holdings()
+    holdings_df = pd.DataFrame.from_dict(holdings, orient='index')
+    holdings_df['Buy-In Price'] = holdings_df['average_buy_price'].astype(float)
+    holdings_df['Shares'] = holdings_df['quantity'].astype(float)
 
-    # Create Pandas DataFrame
-    positions_price_df = pd.DataFrame.from_dict(latest_price_dict, orient='index', columns=['Latest Price'])
-    positions_opendata_df = pd.DataFrame(combined_positions, index=ticker_list)
-    open_price_df = pd.DataFrame({'Open Price': open_prices}, index=ticker_list)
-    
-    # Convert to Float Values
-    positions_price_df['Latest Price'] = positions_price_df['Latest Price'].astype(float)
-    positions_opendata_df['Buy-In Price'] = positions_opendata_df['Buy-In Price'].astype(float)
-    positions_opendata_df['Shares'] = positions_opendata_df['Shares'].astype(float)
-    open_price_df['Open Price'] = open_price_df['Open Price'].astype(float)
+    # Merging holdings data with price data
+    portfolio_data_df = pd.merge(prices_df, holdings_df[['Buy-In Price', 'Shares']], left_index=True, right_index=True)
 
-    # Merging All Data
-    portfolio_data_df = pd.merge(positions_price_df, positions_opendata_df, left_index=True, right_index=True)
-    portfolio_data_df = pd.merge(portfolio_data_df, open_price_df, left_index=True, right_index=True)
+    # Calculating returns
     portfolio_data_df['$ Total Return'] = (portfolio_data_df['Latest Price'] - portfolio_data_df['Buy-In Price']) * portfolio_data_df['Shares']
     portfolio_data_df['% Total Return'] = ((portfolio_data_df['Latest Price'] - portfolio_data_df['Buy-In Price']) / portfolio_data_df['Buy-In Price']) * 100
     portfolio_data_df['% Daily Change'] = ((portfolio_data_df['Latest Price'] - portfolio_data_df['Open Price']) / portfolio_data_df['Open Price']) * 100
-    
-    # Reorder the columns
-    portfolio_data_df = portfolio_data_df[['Open Price', 'Latest Price', 'Buy-In Price', 'Shares', '$ Total Return', '% Total Return', '% Daily Change']]
 
     # Formatting
-    portfolio_data_df['Open Price'] = portfolio_data_df['Open Price'].round(2)
-    portfolio_data_df['Latest Price'] = portfolio_data_df['Latest Price'].round(2)
-    portfolio_data_df['Buy-In Price'] = portfolio_data_df['Buy-In Price'].round(2)
+    portfolio_data_df = portfolio_data_df.round(2)
     portfolio_data_df['Shares'] = portfolio_data_df['Shares'].round(0)
-    portfolio_data_df['$ Total Return'] = portfolio_data_df['$ Total Return'].round(2)
-    portfolio_data_df['% Total Return'] = portfolio_data_df['% Total Return'].round(2)
-    portfolio_data_df['% Daily Change'] = portfolio_data_df['% Daily Change'].round(2)
 
     return portfolio_data_df
 
@@ -68,7 +55,7 @@ def total_return(df):
 notified_stocks = {}
 
 def check_price_change():
-    portfolio_df = rlogic.calculate_portfolio_returns()
+    portfolio_df = calculate_portfolio_returns()
 
     for index, row in portfolio_df.iterrows():
         # Latest price and buy-in details from your portfolio DataFrame
@@ -93,13 +80,31 @@ def check_price_change():
                 os.system(f"osascript -e 'display notification \"{message}\" with title \"{index} {change_type} by {abs(percentage_change):.2f}%\" sound name \"Hero\"'")
                 notified_stocks[index] = percentage_change
                 
-def wait_until_market_open():
-    now = datetime.datetime.now()
-    next_open_hours = r.get_market_next_open_hours("XNYS")
+def check_price_change_loop():
+    while True:
+        now = datetime.datetime.now()
+        next_open_hours = r.get_market_next_open_hours("XNYS")
+
+        if next_open_hours['is_open']:
+            # Market is open, perform the price check
+            check_price_change()
+            # Sleep for a short period, e.g., 1 minute, before checking again
+            time.sleep(60)
+        else:
+            # Calculate time until market opens
+            opens_at = datetime.datetime.fromisoformat(next_open_hours['opens_at'])
+            wait_seconds = (opens_at - now).total_seconds()
+            time.sleep(wait_seconds)
+
+def login():
+    dotenv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    load_dotenv(dotenv_path)
+    username = os.environ.get("USERNAME")
+    password = os.environ.get("PASSWORD")
+    totp_key = os.environ.get("TOTP")
     
-    if next_open_hours['is_open']:
-        return 0 # Run NOW
-    
-    opens_at = datetime.datetime.fromisoformat(next_open_hours['opens_at'])
-    wait_seconds = (opens_at - now).total_seconds()
-    return wait_seconds
+    if not all([username, totp_key, password]):
+        raise ValueError("One or more required environment variables are not set")
+
+    code = pyotp.TOTP(totp_key).now()
+    r.login(username, password, mfa_code=code)
