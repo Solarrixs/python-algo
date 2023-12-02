@@ -36,7 +36,7 @@ class StockApp(QMainWindow):
         # Header Buttons
         hboxHeader = QHBoxLayout()
         
-        self.btn_buy = self.createButton("Buy", "buyButton", ol.on_buy)
+        self.btn_buy = self.createButton("Risk-Set Buy", "buyButton", ol.on_buy)
         hboxHeader.addWidget(self.btn_buy)
 
         self.btn_limit_buy = self.createButton("Limit Buy", "buyButton", ol.on_limit_buy)
@@ -51,7 +51,7 @@ class StockApp(QMainWindow):
         self.btn_stop_loss = self.createButton("Stop Loss", "quitButton", ol.on_stop_loss)
         hboxHeader.addWidget(self.btn_stop_loss)
 
-        self.btn_trailing_stop_loss = self.createButton("TRL", "quitButton", ol.on_trailing_stop_loss)
+        self.btn_trailing_stop_loss = self.createButton("TSL", "quitButton", ol.on_trailing_stop_loss)
         hboxHeader.addWidget(self.btn_trailing_stop_loss)
 
         self.btn_algo = self.createButton("Algo Trade", "updateButton", al.on_algo_trade)

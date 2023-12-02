@@ -1,5 +1,7 @@
 import portfoliologic as pl
-import sys, threading, gui
+import sys
+import threading
+import gui
         
 def run():
     pl.login()

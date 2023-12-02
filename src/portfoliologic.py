@@ -1,9 +1,11 @@
 import robin_stocks.robinhood as r
 import pandas as pd
 import os
-import datetime, time
+import datetime
+import time
 import pyotp
 from dotenv import load_dotenv
+from yahoo_fin import stock_info as si
 
 def calculate_portfolio_returns():
     # All tickers in portfolio
@@ -108,3 +110,35 @@ def login():
 
     code = pyotp.TOTP(totp_key).now()
     r.login(username, password, mfa_code=code)
+    
+def get_filtered_ticker_list():
+    # gather stock symbols from major US exchanges
+    df1 = pd.DataFrame(si.tickers_sp500())
+    df2 = pd.DataFrame(si.tickers_nasdaq())
+    df3 = pd.DataFrame(si.tickers_dow())
+    df4 = pd.DataFrame(si.tickers_other())
+
+    # convert DataFrame to list, then to sets
+    sym1 = set(symbol for symbol in df1[0].values.tolist())
+    sym2 = set(symbol for symbol in df2[0].values.tolist())
+    sym3 = set(symbol for symbol in df3[0].values.tolist())
+    sym4 = set(symbol for symbol in df4[0].values.tolist())
+
+    # join the 4 sets into one. Because it's a set, there will be no duplicate symbols
+    symbols = set.union(sym1, sym2, sym3, sym4)
+
+    # Some stocks are 5 characters. Filter out those not of interest
+    my_list = ['W', 'R', 'P', 'Q']
+    del_set = set()
+    sav_set = set()
+
+    for symbol in symbols:
+        if len(symbol) > 4 and symbol[-1] in my_list:
+            del_set.add(symbol)
+        else:
+            sav_set.add(symbol)
+
+    # Convert the set of saved symbols to a sorted list
+    ticker_list = sorted(list(sav_set))
+
+    return ticker_list
