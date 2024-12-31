@@ -1,0 +1,10 @@
+opencv-python
+pytesseract
+numpy
+openai
+robin-stocks
+pyautogui
+Pillow
+pyotp
+python-dotenv
+cachetools
