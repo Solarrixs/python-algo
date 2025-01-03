@@ -1,10 +1,7 @@
-opencv-python
-pytesseract
-numpy
-openai
-robin-stocks
-pyautogui
-Pillow
-pyotp
-python-dotenv
-cachetools
+opencv-python==4.10.0.84
+pytesseract==0.3.13
+numpy==2.2.1
+pyautogui==0.9.54
+Pillow==11.1.0
+python-dotenv==1.0.1
+pywin32==308

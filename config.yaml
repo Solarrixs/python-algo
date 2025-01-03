@@ -1,8 +1,0 @@
-screenshot_path: "latest_screenshot.png"
-max_trade_amount: 1000
-trade_limit_per_session: 10
-screen_region: [0, 0, 800, 600]
-daily_loss_limit: -1000
-position_size_limit: 0.1
-trade_cooldown_seconds: 300
-screen_check_interval: 10
